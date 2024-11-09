@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* Estilos Generales */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navegación */
+        .navbar {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        /* Carrito de Compras */
+        .cart-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        /* Mensajes de Estado */
+        .message {
+            text-align: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .message-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .message-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+
+        .cart-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .cart-item img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .cart-item h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .cart-item p {
+            margin: 0.3rem 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .cart-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cart-total {
+            text-align: right;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            color: #333;
+        }
+
+        .checkout-button, .update-button, .delete-button {
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .checkout-button {
+            background-color: #28a745;
+            color: white;
+            width: 100%;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        .checkout-button:hover {
+            background-color: #218838;
+        }
+
+        .update-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .update-button:hover {
+            background-color: #218838;
+        }
+
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 4px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación -->
+    <nav class="navbar">
+        <div>
+            <a href="/">Inicio</a>
+            <a href="/products">Productos</a>
+        </div>
+        <div>
+            <a href="/cart">🛒 Carrito</a>
+        </div>
+    </nav>
+    
+    <div class="cart-container">
+        <h1 class="cart-title">Carrito de Compras</h1>
+
+        <!-- Mensaje de éxito o error -->
+        <% if (checkoutMessage) { %>
+            <div class="message <%= checkoutMessage.type === 'success' ? 'message-success' : 'message-error' %>">
+                <%= checkoutMessage.text %>
+            </div>
+        <% } %>
+
+        <% if (cart.length > 0) { %>
+            <% cart.forEach(item => { %>
+                <div class="cart-item">
+                    <img src="<%= item.image_url %>" alt="<%= item.name %>">
+                    <div class="cart-item-details">
+                        <h3><%= item.name %></h3>
+                        <p>Precio Unitario: $<%= item.price %></p>
+                    </div>
+                    <div class="cart-actions">
+                        <form action="/update-cart/<%= item.id %>" method="post">
+                            <label for="quantity-<%= item.id %>">Cantidad:</label>
+                            <input type="number" name="quantity" id="quantity-<%= item.id %>" class="quantity-input" value="<%= item.quantity %>" min="1" required>
+                            <button type="submit" class="update-button">Actualizar</button>
+                        </form>
+                        <form action="/remove-from-cart/<%= item.id %>" method="post">
+                            <button type="submit" class="delete-button">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            <% }); %>
+
+            <div class="cart-total">
+                Total: $<%= total.toFixed(2) %>
+            </div>
+
+            <!-- Botón para Proceder al Pago -->
+            <form action="/checkout" method="post" style="text-align: center;">
+                <button class="checkout-button">Proceder al Pago</button>
+            </form>
+
+        <% } else { %>
+            <p>El carrito está vacío.</p>
+        <% } %>
+    </div>
+</body>
+</html>

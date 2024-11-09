@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* Estilos Generales */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Navegación */
+        .navbar {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        /* Grid de Productos */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 2rem;
+        }
+
+        /* Estilos de Cada Producto */
+        .product-item {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-item img {
+            width: 100%;  /* Asegura que la imagen ocupe todo el ancho del contenedor */
+            height: 200px; /* Define una altura fija */
+            object-fit: cover; /* Recorta la imagen para llenar el espacio sin distorsión */
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .product-item img:hover {
+            transform: scale(1.05);
+        }
+
+        .product-item h2 {
+            font-size: 1.25rem;
+            color: #333;
+            margin: 0.5rem 0;
+        }
+
+        .product-item p {
+            color: #555;
+            font-size: 0.95rem;
+            margin: 0.3rem 0;
+        }
+
+        .product-item .price {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #333;
+            margin-top: 0.5rem;
+        }
+
+        .product-item form {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        /* Botón de Agregar al Carrito */
+        .product-item button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .product-item button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navegación -->
+    <nav class="navbar">
+        <div>
+            <a href="/">Inicio</a>
+            <a href="/products">Productos</a>
+        </div>
+        <div>
+            <a href="/cart">🛒 Carrito</a>
+        </div>
+    </nav>
+    
+    <h1 style="text-align: center; margin-top: 2rem; font-size: 2rem; color: #333;">Lista de Productos</h1>
+    
+    <div class="product-grid">
+        <% products.forEach(product => { %>
+            <div class="product-item">
+                <img src="<%= product.image_url %>" alt="<%= product.name %>" onclick="expandImage('<%= product.image_url %>')" />
+                <h2><%= product.name %></h2>
+                <p><%= product.description %></p>
+                <p class="price">Precio: $<%= product.price %></p>
+                <form action="/add-to-cart/<%= product.id %>" method="post">
+                    <label for="quantity-<%= product.id %>">Cantidad:</label>
+                    <input type="number" name="quantity" id="quantity-<%= product.id %>" class="quantity-input" min="1" max="<%= product.stock %>" value="1" required>
+                    <button type="submit">Agregar al Carrito</button>
+                </form>
+            </div>
+        <% }); %>
+    </div>
+
+    <script>
+        function expandImage(imageUrl) {
+            const imgWindow = window.open("", "_blank");
+            imgWindow.document.write('<img src="' + imageUrl + '" style="width:100%">');
+        }
+    </script>
+</body>
+</html>
