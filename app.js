@@ -19,7 +19,7 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Configuración de la sesión
 app.use(session({
-    secret: 'mySecret',
+    secret: process.env.SESSION_SECRET || 'mySecret', // Usa variable de entorno para la clave secreta
     resave: false,
     saveUninitialized: false
 }));
@@ -32,10 +32,10 @@ app.use((req, res, next) => {
 
 // Conexión a la base de datos
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ecoagua'
+    host: process.env.DB_HOST || 'localhost', // Usa variable de entorno para el host
+    user: process.env.DB_USER || 'root', // Usa variable de entorno para el usuario
+    password: process.env.DB_PASSWORD || '', // Usa variable de entorno para la contraseña
+    database: process.env.DB_NAME || 'ecoagua' // Usa variable de entorno para el nombre de la base de datos
 });
 
 db.connect((err) => {
@@ -75,7 +75,7 @@ app.get('/products', (req, res) => {
 app.get('/cart', (req, res) => {
     const cart = req.session.cart || [];
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    res.render('cart', { cart, total, checkoutMessage: null }); // Definimos checkoutMessage como null por defecto
+    res.render('cart', { cart, total, checkoutMessage: null });
 });
 
 // Agregar productos al carrito de compras
@@ -125,7 +125,6 @@ app.post('/update-cart/:id', (req, res) => {
 // Simulación de pago
 app.post('/checkout', (req, res) => {
     if (!req.session.user) {
-        // Si el usuario no está autenticado, redirigir a la página del carrito con un mensaje de error
         return res.render('cart', {
             cart: req.session.cart || [],
             total: req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
@@ -133,7 +132,6 @@ app.post('/checkout', (req, res) => {
         });
     }
 
-    // Si el usuario está autenticado, mostrar mensaje de éxito
     res.render('cart', {
         cart: req.session.cart || [],
         total: req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
@@ -177,7 +175,7 @@ app.post('/login', async (req, res) => {
         if (isMatch) {
             req.session.userId = user.id;
             req.session.username = user.username;
-            req.session.user = user; // Guardar el usuario completo en la sesión
+            req.session.user = user;
             res.redirect('/');
         } else {
             res.render('login', { error: 'Contraseña incorrecta' });
@@ -210,6 +208,7 @@ app.get('/post', (req, res) => {
 });
 
 // Iniciar servidor
-app.listen(3000, () => {
-    console.log('Servidor corriendo en http://localhost:3000');
+const port = process.env.PORT || 3000; // Usar el puerto proporcionado por Railway
+app.listen(port, () => {
+    console.log(`Servidor corriendo en el puerto ${port}`);
 });
