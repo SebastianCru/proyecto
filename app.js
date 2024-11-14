@@ -32,11 +32,13 @@ app.use((req, res, next) => {
 
 // Conexión a la base de datos
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost', // Usa variable de entorno para el host
-    user: process.env.DB_USER || 'root', // Usa variable de entorno para el usuario
-    password: process.env.DB_PASSWORD || '', // Usa variable de entorno para la contraseña
-    database: process.env.DB_NAME || 'ecoagua' // Usa variable de entorno para el nombre de la base de datos
+    host: process.env.MYSQLHOST,
+    user: process.env.MYSQLUSER,
+    password: process.env.MYSQLPASSWORD,
+    database: process.env.MYSQLDATABASE,
+    port: process.env.MYSQLPORT || 3306 // Asegura que el puerto esté definido, por defecto es 3306
 });
+
 
 db.connect((err) => {
     if (err) {
