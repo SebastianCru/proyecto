@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
+require('dotenv').config();
+
 require('dotenv').config(); // Cargar variables de entorno
 
 const app = express();
@@ -36,8 +38,9 @@ const db = mysql.createConnection({
     user: process.env.MYSQLUSER,
     password: process.env.MYSQLPASSWORD,
     database: process.env.MYSQLDATABASE,
-    port: process.env.MYSQLPORT || 3306 // Asegura que el puerto esté definido, por defecto es 3306
+    port: process.env.MYSQLPORT || 3306
 });
+
 
 
 db.connect((err) => {
